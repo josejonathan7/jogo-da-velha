@@ -4,13 +4,13 @@
 
 ## Entrega básica
 
-* [  ] O sistema deve ter um algoritmo que faça com que a máquina jogue contra o usuário.
+* [X] O sistema deve ter um algoritmo que faça com que a máquina jogue contra o usuário.
 
 * [  ] As jogadas devem ser armazenadas em LocalStorage e ou DB para posterior consulta.
 
 ## Entrega Avançada
 
-* [  ] O sistema deve ter um algoritmo que faça com que a máquina jogue contra o usuário.
+* [X] O sistema deve ter um algoritmo que faça com que a máquina jogue contra o usuário.
 
 * [  ] O algoritmo do jogo deve conter 3 níveis de dificuldade.
 

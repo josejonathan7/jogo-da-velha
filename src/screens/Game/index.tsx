@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import style from "./style.module.scss";
+import { validateWin } from "../../utils/validate";
 
-
+let count = 0;
 
 export function Game() {
 	const [ checkBoxes, setCheckBoxes ] = useState<HTMLElement | null>();
 	const [playOptions, setPlayOptions] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+	const navigate = useNavigate();
+
 	const paragraphUserElement = document.createElement("p");
 	paragraphUserElement.innerHTML = "X";
 
@@ -18,34 +22,66 @@ export function Game() {
 	}, []);
 
 
+	const clearBoxs = () => {
+		const element = document.querySelectorAll("span");
+		element.forEach(el => {
+
+
+			if(el.innerHTML) {
+				console.log(el.innerHTML);
+				el.removeChild(el.firstChild!);
+			} else {
+				return;
+			}
+		});
+	};
+
+	const playerWinner = () => {
+		count = 0;
+		setPlayOptions([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+		clearBoxs();
+	};
+
 	const selectBox = (id: string) => {
 		const play = parseInt(id);
 
 		if(playOptions.includes(play)) {
 			checkBoxes!.childNodes[play].appendChild(paragraphUserElement);
 
-			Promise.resolve(setPlayOptions(playOptions.filter(item => item !== play)));
+			if(validateWin(checkBoxes!)) {
+				alert("Você venceu!");
+				playerWinner();
+				return;
+			}
+
+			count++;
+
+			if(count >=9 ) {
+				alert("O jogo acabou!");
+				count = 0;
+				setPlayOptions([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+				clearBoxs();
+			} else {
+				setPlayOptions(() => {
+					const state = playOptions.filter(item => item !== play);
+					const computerPlay = Math.floor(Math.random() * state.length);
+
+					checkBoxes!.childNodes[state[computerPlay]].appendChild(paragraphComputerElement);
+
+					if(validateWin(checkBoxes!)) {
+						alert("O computador venceu!");
+						playerWinner();
+						return [0, 1, 2, 3, 4, 5, 6, 7, 8];
+					}
+
+					const updatedState = state.filter(item => item !== state[computerPlay]);
+					return updatedState;
+				});
 
 
-			const computerPlay = Math.floor(Math.random() * playOptions.length);
 
-			console.log("random: ", computerPlay);
-
-
-			console.log(computerPlay);
-			checkBoxes!.childNodes[playOptions[computerPlay]].appendChild(paragraphComputerElement);
-			Promise.resolve(setPlayOptions(playOptions.filter(item => item !== playOptions[computerPlay])));
-
-			/*do {
-				if(playOptions.includes(computerPlay)){
-					checkBoxes?.childNodes[computerPlay].appendChild(paragraphComputerElement);
-					playOptions.filter(item => item !== computerPlay);
-					loop = false;
-
-				} else {
-					computerPlay = Math.floor(Math.random() * (0 - 8) + 0);
-				}
-			} while (loop)*/
+				count++;
+			}
 
 
 		} else {
