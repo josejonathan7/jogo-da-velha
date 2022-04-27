@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import style from "./style.module.scss";
 import { validateWin } from "../../utils/validate";
 
 let count = 0;
 
-export function Game() {
+
+export function Game () {
 	const [ checkBoxes, setCheckBoxes ] = useState<HTMLElement | null>();
 	const [playOptions, setPlayOptions] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8]);
 	const navigate = useNavigate();
@@ -17,8 +18,54 @@ export function Game() {
 	paragraphComputerElement.innerHTML = "O";
 
 
+
 	useEffect(() => {
-		return setCheckBoxes(document.querySelector("main"));
+		const mainElement = document.querySelector("main");
+
+		const storageMemorize = [];
+
+		for (let i = 0; i < localStorage.length; i++) {
+			storageMemorize.push(localStorage.key(i));
+		}
+		console.log("tamanho: ", storageMemorize.length);
+
+		if(storageMemorize.length > 0){
+			console.log("tamanho: ", storageMemorize.length);
+
+			for(const keyValueStorage of storageMemorize) {
+
+
+				const paragraphElement =  document.createElement("p");
+
+				const [player, ,position] = keyValueStorage!.split(" ");
+
+				player === "player" ? paragraphElement.innerHTML = "X" : paragraphElement.innerHTML = "O";
+
+
+
+				if(player === "player" ){
+					console.log(!mainElement!.childNodes[parseInt(position)].hasChildNodes());
+					if(!mainElement!.childNodes[parseInt(position)].hasChildNodes()) {
+
+						mainElement!.childNodes[parseInt(position)].appendChild(paragraphElement);
+					}
+
+					mainElement!.childNodes[parseInt(position)].appendChild(paragraphElement);
+
+				} else {
+					if(!mainElement!.childNodes[parseInt(position)].hasChildNodes()) {
+						mainElement!.childNodes[parseInt(position)].appendChild(paragraphElement);
+					}
+
+					mainElement!.childNodes[parseInt(position)].appendChild(paragraphElement);
+				}
+
+				setPlayOptions(playOptions.filter(item => item !== parseInt(position)));
+			}
+		}
+
+
+		setCheckBoxes(mainElement);
 	}, []);
 
 
@@ -26,9 +73,7 @@ export function Game() {
 		const element = document.querySelectorAll("span");
 		element.forEach(el => {
 
-
 			if(el.innerHTML) {
-				console.log(el.innerHTML);
 				el.removeChild(el.firstChild!);
 			} else {
 				return;
@@ -40,6 +85,7 @@ export function Game() {
 		count = 0;
 		setPlayOptions([0, 1, 2, 3, 4, 5, 6, 7, 8]);
 		clearBoxs();
+		localStorage.clear();
 	};
 
 	const selectBox = (id: string) => {
@@ -47,6 +93,8 @@ export function Game() {
 
 		if(playOptions.includes(play)) {
 			checkBoxes!.childNodes[play].appendChild(paragraphUserElement);
+
+			localStorage.setItem(`player position: ${id}`, id);
 
 			if(validateWin(checkBoxes!)) {
 				alert("Você venceu!");
@@ -61,26 +109,30 @@ export function Game() {
 				count = 0;
 				setPlayOptions([0, 1, 2, 3, 4, 5, 6, 7, 8]);
 				clearBoxs();
+				localStorage.clear();
 			} else {
-				setPlayOptions(() => {
+				let selectComputerPosition: number;
+
+				Promise.resolve(setPlayOptions(() => {
 					const state = playOptions.filter(item => item !== play);
 					const computerPlay = Math.floor(Math.random() * state.length);
+					selectComputerPosition = state[computerPlay];
 
 					checkBoxes!.childNodes[state[computerPlay]].appendChild(paragraphComputerElement);
 
-					if(validateWin(checkBoxes!)) {
-						alert("O computador venceu!");
-						playerWinner();
-						return [0, 1, 2, 3, 4, 5, 6, 7, 8];
-					}
+
 
 					const updatedState = state.filter(item => item !== state[computerPlay]);
 					return updatedState;
+				})).then(() => {
+
+					localStorage.setItem(`computer position: ${selectComputerPosition}`, `${selectComputerPosition}`);
+					count++;
+					if(validateWin(checkBoxes!)) {
+						alert("O computador venceu!");
+						playerWinner();
+					}
 				});
-
-
-
-				count++;
 			}
 
 

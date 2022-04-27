@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Game } from "./screens/Game";
 import { Home } from "./screens/Home";
 
+
+
 function App() {
 
 	return (

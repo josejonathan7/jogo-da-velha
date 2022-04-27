@@ -3,8 +3,6 @@
 export function validateWin(item: HTMLElement) {
 	const children = item.childNodes;
 
-	console.log(children[0].textContent);
-
 	if(children[0].textContent === "X" && children[1].textContent === "X" && children[2].textContent === "X" || children[0].textContent === "O" && children[1].textContent === "O" && children[2].textContent === "O") {
 		return true;
 	}
