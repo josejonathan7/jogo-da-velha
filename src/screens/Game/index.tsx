@@ -1,23 +1,15 @@
-import React, { useEffect, useMemo, useState } from "react";
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import React, { useEffect, useState } from "react";
+import {GrFormPreviousLink} from "react-icons/gr";
 import { useNavigate } from "react-router-dom";
+import {EasyGame} from "../../components";
 import style from "./style.module.scss";
-import { validateWin } from "../../utils/validate";
-
-let count = 0;
-
 
 export function Game () {
 	const [ checkBoxes, setCheckBoxes ] = useState<HTMLElement | null>();
 	const [playOptions, setPlayOptions] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+	const [count, setCount] = useState(0);
 	const navigate = useNavigate();
-
-	const paragraphUserElement = document.createElement("p");
-	paragraphUserElement.innerHTML = "X";
-
-	const paragraphComputerElement = document.createElement("p");
-	paragraphComputerElement.innerHTML = "O";
-
-
 
 	useEffect(() => {
 		const mainElement = document.querySelector("main");
@@ -27,43 +19,41 @@ export function Game () {
 		for (let i = 0; i < localStorage.length; i++) {
 			storageMemorize.push(localStorage.key(i));
 		}
-		console.log("tamanho: ", storageMemorize.length);
 
 		if(storageMemorize.length > 0){
-			console.log("tamanho: ", storageMemorize.length);
+			const storedPositions = storageMemorize.map(value => {
+				const [,, position] = value!.split(" ");
+
+				return parseInt(position);
+			});
 
 			for(const keyValueStorage of storageMemorize) {
-
-
 				const paragraphElement =  document.createElement("p");
-
 				const [player, ,position] = keyValueStorage!.split(" ");
 
 				player === "player" ? paragraphElement.innerHTML = "X" : paragraphElement.innerHTML = "O";
 
-
-
 				if(player === "player" ){
-					console.log(!mainElement!.childNodes[parseInt(position)].hasChildNodes());
 					if(!mainElement!.childNodes[parseInt(position)].hasChildNodes()) {
-
 						mainElement!.childNodes[parseInt(position)].appendChild(paragraphElement);
 					}
-
-					mainElement!.childNodes[parseInt(position)].appendChild(paragraphElement);
 
 				} else {
 					if(!mainElement!.childNodes[parseInt(position)].hasChildNodes()) {
 						mainElement!.childNodes[parseInt(position)].appendChild(paragraphElement);
 					}
-
-					mainElement!.childNodes[parseInt(position)].appendChild(paragraphElement);
 				}
-
-				setPlayOptions(playOptions.filter(item => item !== parseInt(position)));
 			}
-		}
 
+			setCount(storedPositions.length);
+
+
+			setPlayOptions(prevState => {
+				const nextState = prevState.filter(value => !storedPositions.includes(value));
+
+				return nextState;
+			});
+		}
 
 		setCheckBoxes(mainElement);
 	}, []);
@@ -82,89 +72,28 @@ export function Game () {
 	};
 
 	const playerWinner = () => {
-		count = 0;
+		setCount(0);
 		setPlayOptions([0, 1, 2, 3, 4, 5, 6, 7, 8]);
 		clearBoxs();
 		localStorage.clear();
 	};
 
-	const selectBox = (id: string) => {
-		const play = parseInt(id);
-
-		if(playOptions.includes(play)) {
-			checkBoxes!.childNodes[play].appendChild(paragraphUserElement);
-
-			localStorage.setItem(`player position: ${id}`, id);
-
-			if(validateWin(checkBoxes!)) {
-				alert("Você venceu!");
-				playerWinner();
-				return;
-			}
-
-			count++;
-
-			if(count >=9 ) {
-				alert("O jogo acabou!");
-				count = 0;
-				setPlayOptions([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-				clearBoxs();
-				localStorage.clear();
-			} else {
-				let selectComputerPosition: number;
-
-				Promise.resolve(setPlayOptions(() => {
-					const state = playOptions.filter(item => item !== play);
-					const computerPlay = Math.floor(Math.random() * state.length);
-					selectComputerPosition = state[computerPlay];
-
-					checkBoxes!.childNodes[state[computerPlay]].appendChild(paragraphComputerElement);
-
-
-
-					const updatedState = state.filter(item => item !== state[computerPlay]);
-					return updatedState;
-				})).then(() => {
-
-					localStorage.setItem(`computer position: ${selectComputerPosition}`, `${selectComputerPosition}`);
-					count++;
-					if(validateWin(checkBoxes!)) {
-						alert("O computador venceu!");
-						playerWinner();
-					}
-				});
-			}
-
-
-		} else {
-			alert("Esse campo já foi preenchido");
-		}
-	};
-
-
+	console.log("count no componente pai: ", count);
 	return (
 		<div className={style.body}>
 
-			<main className={style.main}>
+			<button className={style.button} onClick={() => navigate("/")} title="Retorna para a página anterior">
+				<GrFormPreviousLink size={40} color="#FFFFFF"  />
+			</button>
 
-				<span id="0"  onClick={element => selectBox(element.currentTarget.id)} />
-
-
-
-				<span id="1" onClick={element => selectBox(element.currentTarget.id)} />
-				<span id="2" onClick={element => selectBox(element.currentTarget.id)} />
-
-				<span id="3" onClick={element => selectBox(element.currentTarget.id)} />
-
-				<span id="4" onClick={element => selectBox(element.currentTarget.id)} />
-				<span id="5" onClick={element => selectBox(element.currentTarget.id)} />
-				<span id="6" onClick={element => selectBox(element.currentTarget.id)} />
-				<span id="7" onClick={element => selectBox(element.currentTarget.id)} />
-				<span id="8" onClick={element => selectBox(element.currentTarget.id)} />
-
-			</main>
-
-
+			<EasyGame
+				playerWinner={playerWinner}
+				count={count}
+				setCount={setCount}
+				checkBoxes={checkBoxes}
+				playOptions={playOptions}
+				setPlayOptions={setPlayOptions}
+			/>
 
 		</div>
 	);
