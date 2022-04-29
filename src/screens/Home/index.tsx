@@ -18,9 +18,7 @@ export function Home () {
 				</header>
 
 				<div className={style.buttonGroup}>
-					<button onClick={() => navigate("/game", { state: "easy" })} >Iniciar no nivel fácil</button>
-					<button onClick={() => navigate("/game", { state: "medium" })}>Iniciar no nivel médio</button>
-					<button onClick={() => navigate("/game", { state: "hard" })}>Iniciar no nível dificil</button>
+					<button onClick={() => navigate("/game", { state: "easy" })} >Iniciar jogo</button>
 				</div>
 			</main>
 

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useEffect, useState } from "react";
 import {GrFormPreviousLink} from "react-icons/gr";
+import {BiReset} from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import {EasyGame} from "../../components";
 import style from "./style.module.scss";
@@ -71,7 +72,7 @@ export function Game () {
 		});
 	};
 
-	const playerWinner = () => {
+	const endGame = () => {
 		setCount(0);
 		setPlayOptions([0, 1, 2, 3, 4, 5, 6, 7, 8]);
 		clearBoxs();
@@ -82,12 +83,20 @@ export function Game () {
 	return (
 		<div className={style.body}>
 
-			<button className={style.button} onClick={() => navigate("/")} title="Retorna para a página anterior">
-				<GrFormPreviousLink size={40} color="#FFFFFF"  />
-			</button>
+			<header className={style.header}>
+				<button className={style.buttonReturn} onClick={() => navigate("/")} title="Retorna para a página anterior">
+					<GrFormPreviousLink size={40}  />
+				</button>
+
+				<button className={style.buttonReset} title="Resetar jogo" onClick={() => endGame()}>
+					<p>Resetar jogo</p>
+					<BiReset size={40} color="#000000" />
+				</button>
+			</header>
+
 
 			<EasyGame
-				playerWinner={playerWinner}
+				endGame={endGame}
 				count={count}
 				setCount={setCount}
 				checkBoxes={checkBoxes}

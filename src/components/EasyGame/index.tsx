@@ -1,20 +1,11 @@
 import React from "react";
+import { Props } from "../../interface";
 import { validateWin } from "../../utils/validate";
-import style from "../style.module.scss";
-
-
-interface Props {
-	playerWinner: () => void;
-	playOptions: number[];
-	count: number;
-	checkBoxes: HTMLElement | null | undefined;
-	setPlayOptions: React.Dispatch<React.SetStateAction<number[]>>;
-	setCount: React.Dispatch<React.SetStateAction<number>>;
-}
+import style from "./style.module.scss";
 
 let countingOutOfState: number;
 
-export function EasyGame ({ playerWinner, playOptions, count, checkBoxes, setPlayOptions, setCount }: Props) {
+export function EasyGame ({ endGame, playOptions, count, checkBoxes, setPlayOptions, setCount }: Props) {
 
 	countingOutOfState = count+1;
 
@@ -33,7 +24,7 @@ export function EasyGame ({ playerWinner, playOptions, count, checkBoxes, setPla
 			if(validateWin(checkBoxes!)) {
 				alert("Você venceu!");
 				countingOutOfState = count;
-				playerWinner();
+				endGame();
 				return;
 			}
 
@@ -48,7 +39,7 @@ export function EasyGame ({ playerWinner, playOptions, count, checkBoxes, setPla
 
 			if(countingOutOfState >=9 ) {
 				alert("O jogo acabou, ninguém venceu!");
-				playerWinner();
+				endGame();
 				return;
 			} else {
 				let selectComputerPosition: number;
@@ -80,7 +71,7 @@ export function EasyGame ({ playerWinner, playOptions, count, checkBoxes, setPla
 					if(validateWin(checkBoxes!)) {
 						countingOutOfState = count;
 						alert("O computador venceu!");
-						playerWinner();
+						endGame();
 					}
 				});
 			}
@@ -111,8 +102,6 @@ export function EasyGame ({ playerWinner, playOptions, count, checkBoxes, setPla
 				<span id="8" onClick={element => selectBoxEasyDifficulty(element.currentTarget.id)} title="Clique no campo para selecionar" />
 
 			</main>
-
-
 
 		</div>
 	);
